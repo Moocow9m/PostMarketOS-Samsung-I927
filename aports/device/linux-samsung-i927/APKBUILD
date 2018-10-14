@@ -1,0 +1,87 @@
+# Kernel config based on: arch/arm/configs/(CHANGEME!)
+
+pkgname="linux-samsung-i927"
+pkgver=3.1.10
+pkgrel=0
+pkgdesc="Samsung i927 Captivate Glide kernel fork"
+arch="armhf"
+_carch="arm"
+_flavor="samsung-i927"
+url="https://kernel.org"
+license="GPL2"
+options="!strip !check !tracedeps"
+makedepends="perl sed installkernel bash gmp-dev bc linux-headers elfutils-dev"
+HOSTCC="${CC:-gcc}"
+HOSTCC="${HOSTCC#${CROSS_COMPILE}}"
+
+# Source
+_repository="kernel_samsung_i927"
+_commit="a10e9e652dd5a4acd5d32376d939704a99d4ef88"
+_config="config-${_flavor}.${arch}"
+source="
+	$pkgname-$_commit.tar.gz::https://github.com/Moocow9m/${_repository}/archive/${_commit}.tar.gz
+	$_config
+	compiler-gcc6.h
+	compiler-gcc8.h
+	00_fix_return_address.patch
+	01_reduce_lzo_compression.patch
+	02_gcc8_error.patch
+"
+builddir="$srcdir/${_repository}-${_commit}"
+
+prepare() {
+	default_prepare
+
+	# gcc6 support
+	cp -v "$srcdir/compiler-gcc6.h" "$builddir/include/linux/"
+	
+	# gcc8 support
+	cp -v "$srcdir/compiler-gcc8.h" "$builddir/include/linux/"
+
+	# Remove -Werror from all makefiles
+	local i
+	local makefiles="$(find . -type f -name Makefile)
+		$(find . -type f -name Kbuild)"
+	for i in $makefiles; do
+		sed -i 's/-Werror-/-W/g' "$i"
+		sed -i 's/-Werror//g' "$i"
+	done
+
+	# Prepare kernel config ('yes ""' for kernels lacking olddefconfig)
+	cp "$srcdir"/$_config "$builddir"/.config
+	yes "" | make ARCH="$_carch" HOSTCC="$HOSTCC" oldconfig
+}
+
+build() {
+	unset LDFLAGS
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-postmarketOS"
+}
+
+package() {
+	# kernel.release
+	install -D "$builddir/include/config/kernel.release" \
+		"$pkgdir/usr/share/kernel/$_flavor/kernel.release"
+
+	# zImage (find the right one)
+	cd "$builddir/arch/$_carch/boot"
+	_target="$pkgdir/boot/vmlinuz-$_flavor"
+	for _zimg in zImage-dtb Image.gz-dtb *zImage Image; do
+		[ -e "$_zimg" ] || continue
+		msg "zImage found: $_zimg"
+		install -Dm644 "$_zimg" "$_target"
+		break
+	done
+	if ! [ -e "$_target" ]; then
+		error "Could not find zImage in $PWD!"
+		return 1
+	fi
+}
+
+sha512sums="ab4c9c1189df8fc740680f6b7cf10c30bac5672da0821e304564e3d11a1d75f3c2b75836484462b5cb0bdaf2a2b0182a571c339713b29423c85800963d87f2c3  linux-samsung-i927-a10e9e652dd5a4acd5d32376d939704a99d4ef88.tar.gz
+da00ac117d15706b4b7bcd3c2a326e0ebfb50ee7535c462334b9c63ff55cb25649ea06b40ffdf3fe8375e211b4dce256f97db497e36d5cb29e4a21a532c0269d  config-samsung-i927.armhf
+d80980e9474c82ba0ef1a6903b434d8bd1b092c40367ba543e72d2c119301c8b2d05265740e4104ca1ac5d15f6c4aa49e8776cb44264a9a28dc551e0d1850dcc  compiler-gcc6.h
+cf8dc00c377a17fa785ba5bf33cf1c7accd14515a617c4c785b047945bd69e66b9d51fdacaf5aef4ec0a6438a42514beee837394215a04774ffd47bc081a54e6  compiler-gcc8.h
+ea1d3b5a234fa565e3c1a792de48f4fc4e6023d281d303c8e319c7ef28edc5739ab0e4dea0139a41f0a5c7d03e27921ccaa214fd0ac5c72245a094ce60128864  00_fix_return_address.patch
+ef5b912c26fea4ab882592bdf7487942c64b123de8d25d08d976f29743f311742ee2f773bf2d110ddb5095f254dbb0bd4487c5cfce77311929082599199e7ebd  02_reduce_lzo_compression.patch
+bbf22335a35986aa95c97177cf608cf7483de47e5bf91e01b588f7fa03a221259737efc4b00cb43d5d01bc43b20a507bf2cb87af79647195dc75c68ac6b69bf6  03_gcc8_error.patch"
