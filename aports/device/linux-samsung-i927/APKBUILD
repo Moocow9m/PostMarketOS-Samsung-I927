@@ -24,8 +24,8 @@ source="
 	compiler-gcc6.h
 	compiler-gcc8.h
 	00_fix_return_address.patch
-	01_reduce_lzo_compression.patch
-	02_gcc8_error.patch
+	02_reduce_lzo_compression.patch
+	03_gcc8_error.patch
 "
 builddir="$srcdir/${_repository}-${_commit}"
 
