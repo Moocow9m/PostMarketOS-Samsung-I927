@@ -1,16 +1,16 @@
 # Kernel config based on: arch/arm/configs/(CHANGEME!)
 
-pkgname="linux-samsung-i927"
+pkgname="linux-samsung-sgh-i927"
 pkgver=3.1.10
 pkgrel=0
-pkgdesc="Samsung i927 Captivate Glide kernel fork"
+pkgdesc="Samsung Captivate Glide kernel fork"
 arch="armhf"
 _carch="arm"
-_flavor="samsung-i927"
+_flavor="samsung-sgh-i927"
 url="https://kernel.org"
 license="GPL2"
 options="!strip !check !tracedeps"
-makedepends="perl sed installkernel bash gmp-dev bc linux-headers elfutils-dev"
+makedepends="perl sed installkernel bash gmp-dev bc linux-headers elfutils-dev devicepkg-dev"
 HOSTCC="${CC:-gcc}"
 HOSTCC="${HOSTCC#${CROSS_COMPILE}}"
 

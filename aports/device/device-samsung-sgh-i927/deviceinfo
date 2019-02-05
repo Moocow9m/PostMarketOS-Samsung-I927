@@ -4,6 +4,7 @@
 deviceinfo_format_version="0"
 deviceinfo_name="Samsung Captivate Glide"
 deviceinfo_manufacturer="Samsung"
+deviceinfo_codename="samsung-sgh-i927"
 deviceinfo_date=""
 deviceinfo_dtb=""
 deviceinfo_modules_initfs=""
@@ -20,16 +21,14 @@ deviceinfo_dev_keyboard=""
 
 # Bootloader related
 deviceinfo_flash_method="heimdall-bootimg"
-
-deviceinfo_kernel_cmdline="time mem=511M@0M secmem=1M@511M mem=512M@512M vmalloc=256M fota_boot=false tegra_fbmem=800K@0x18012000 video=tegrafb console=ttyUSB0,115200 console=ram usbcore.old_scheme_first=1 lp0_vec=8192@0x1819E000 emmc_checksum_done=true emmc_checksum_pass=true tegraboot=sdmmc gpt androidboot.selinux=permissive"
+deviceinfo_kernel_cmdline=""
 deviceinfo_generate_bootimg="true"
 deviceinfo_bootimg_qcdt="false"
-deviceinfo_flash_offset_base="0x10000000"
+deviceinfo_flash_offset_base="0x81600000"
 deviceinfo_flash_offset_kernel="0x00008000"
 deviceinfo_flash_offset_ramdisk="0x01000000"
 deviceinfo_flash_offset_second="0x00f00000"
 deviceinfo_flash_offset_tags="0x00000100"
-deviceinfo_flash_pagesize="2048"
+deviceinfo_flash_pagesize="4096"
 deviceinfo_flash_heimdall_partition_kernel="LNX"
 deviceinfo_flash_heimdall_partition_system="APP"
-
