@@ -1,4 +1,4 @@
-#Outdated
+# Outdated
 stoped due to issue: https://github.com/Moocow9m/PostMarketOS-Samsung-I927/issues/1
 
 # PostMarketOS-Samsung-I927
